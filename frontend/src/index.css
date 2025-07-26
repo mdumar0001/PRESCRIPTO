@@ -10,3 +10,10 @@
   color: red;
   display: block;
 } */
+
+.active hr {
+  display: block;
+}
+::-webkit-scrollbar {
+  display: none;
+}
