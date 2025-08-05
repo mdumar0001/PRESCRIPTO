@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
-  const [token, setToken] = useState(true); //token tue mean use logged in so we will not show the creat account button
+  const { token, setToken } = useContext(AppContext);
+  //token tue mean use logged in so we will not show the create account button
+
+  const logout = () => {
+    setToken(false);
+    localStorage.removeItem("token");
+  };
+
   return (
     <div className=" flex justify-between items-center text-sm py-4 mb-5 border-b border-b-gray-400">
       <img
@@ -51,7 +59,7 @@ const Navbar = () => {
                   My Appointments
                 </p>
                 <p
-                  onClick={() => setToken(false)}
+                  onClick={() => logout()}
                   className="hover:text-black cursor-pointer"
                 >
                   Logout

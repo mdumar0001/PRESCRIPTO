@@ -69,14 +69,17 @@ const addDoctor = async (req, res) => {
       speciality,
       degree,
       experience,
+      fees,
       about,
       address: JSON.parse(address),
       date: Date.now(),
     };
     const newDoctor = new doctorModel(doctorData);
     await newDoctor.save();
+    res.json({ success: true, message: "Doctor Added" });
   } catch (error) {
     console.log(error);
+    // console.log(imageFile);
     res.json({ success: false, message: error.message });
   }
 };
@@ -103,4 +106,17 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-export { addDoctor, loginAdmin };
+//API to get all doctors list for admin panel
+const allDoctors = async (req, res) => {
+  try {
+    //because we do not want to get password so we will remove it from response
+
+    const doctors = await doctorModel.find({}).select("-password");
+    res.json({ success: true, doctors });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { addDoctor, loginAdmin, allDoctors };
