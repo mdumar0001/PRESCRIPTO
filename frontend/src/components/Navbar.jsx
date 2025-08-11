@@ -6,7 +6,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const { token, setToken, userData } = useContext(AppContext);
-  //token tue mean use logged in so we will not show the create account button
+  //token true mean use logged in so we will not show the create account button
 
   const logout = () => {
     setToken(false);
