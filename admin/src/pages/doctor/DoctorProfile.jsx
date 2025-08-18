@@ -16,7 +16,7 @@ const DoctorProfile = () => {
       const updateData = {
         address: profileData.address,
         fees: profileData.fees,
-        available: profileData.avaialble,
+        available: profileData.available,
       };
       const { data } = await axios.post(
         backendUrl + "/api/doctor/update-profile",

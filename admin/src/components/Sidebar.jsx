@@ -8,7 +8,7 @@ const Sidebar = () => {
   const { aToken } = useContext(AdminContext);
   const { dToken } = useContext(DoctorContext);
   return (
-    // token check karna hata bhi skte hain kyunki App component me pahle hi cgekc kar rhe login ie token hai ki nhi tabhi ye component load  kar rhe hai
+    // token check karna hata bhi skte hain kyunki App component me pahle hi chekc kar rhe login ie token hai ki nhi tabhi ye component load  kar rhe hai
     <div className="min-h-screen bg-white border-r">
       {aToken && (
         <ul className="text-[#515151] mt-5">
@@ -20,7 +20,7 @@ const Sidebar = () => {
             }
             to={"/admin-dashboard"}
           >
-            <img src={assets.home_icon} alt="" />
+            <img className="min-w-6" src={assets.home_icon} alt="" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
           <NavLink
@@ -31,7 +31,7 @@ const Sidebar = () => {
             }
             to={"/all-appointments"}
           >
-            <img src={assets.appointment_icon} alt="" />
+            <img className="min-w-6" src={assets.appointment_icon} alt="" />
             <p className="hidden md:block">Appointment</p>
           </NavLink>
           <NavLink
@@ -42,7 +42,7 @@ const Sidebar = () => {
             }
             to={"/add-doctor"}
           >
-            <img src={assets.add_icon} alt="" />
+            <img className="min-w-6" src={assets.add_icon} alt="" />
             <p className="hidden md:block">Add Doctor</p>
           </NavLink>
           <NavLink
@@ -53,7 +53,7 @@ const Sidebar = () => {
             }
             to={"/doctor-list"}
           >
-            <img src={assets.people_icon} alt="" />
+            <img className="min-w-6" src={assets.people_icon} alt="" />
             <p className="hidden md:block">Doctor List</p>
           </NavLink>
         </ul>
@@ -68,7 +68,7 @@ const Sidebar = () => {
             }
             to={"/doctor-dashboard"}
           >
-            <img src={assets.home_icon} alt="" />
+            <img className="min-w-6" src={assets.home_icon} alt="" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
           <NavLink
@@ -79,7 +79,7 @@ const Sidebar = () => {
             }
             to={"/doctor-appointments"}
           >
-            <img src={assets.appointment_icon} alt="" />
+            <img className="min-w-6" src={assets.appointment_icon} alt="" />
             <p className="hidden md:block">Appointment</p>
           </NavLink>
           <NavLink
@@ -90,7 +90,7 @@ const Sidebar = () => {
             }
             to={"/doctor-profile"}
           >
-            <img src={assets.people_icon} alt="" />
+            <img className="min-w-6" src={assets.people_icon} alt="" />
             <p className="hidden md:block">Profile</p>
           </NavLink>
         </ul>

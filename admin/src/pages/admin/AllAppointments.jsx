@@ -30,7 +30,7 @@ const AllAppointments = () => {
         </div>
         {appointments.map((item, index) => (
           <div
-            className="flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] item-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
+            className="flex justify-between items-center max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr]  text-gray-500 py-3 max-sm:px-1.5 px-6 border-b hover:bg-gray-50"
             key={index}
           >
             <p className="max-sm:hidden">{index + 1}</p>
@@ -43,8 +43,9 @@ const AllAppointments = () => {
               {item.userData.name}
             </div>
             <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
-            <p>
-              {slotDateFormat(item.slotDate)},{item.slotTime}
+            <p className="max-sm:flex max-sm:flex-col">
+              <span>{slotDateFormat(item.slotDate)}</span>
+              <span> {item.slotTime}</span>
             </p>
             <div className="flex items-center gap-2">
               <img
@@ -52,14 +53,14 @@ const AllAppointments = () => {
                 src={item.docData.image}
                 alt=""
               />
-              {item.userData.name}
+              {item.docData.name}
             </div>
             <p>
               {currency}
               {item.amount}
             </p>
             {item.cancelled ? (
-              <p className="text-red-400 text-xs font-medium">Cancell</p>
+              <p className="text-red-400 text-xs font-medium ">Cancell</p>
             ) : item.isCompleted ? (
               <p className="text-green-500 text-xs font-medium">Completed</p>
             ) : (

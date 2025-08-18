@@ -11,7 +11,11 @@ const userSchema = new mongoose.Schema({
   }, //whenever new user will be created then this default pic will be provided ,for this search image to base6 and go to the wevsite Base94 image encoder website
   address: { type: Object, default: { line1: "", line2: "" } },
   gender: { type: String, default: "Not Selected" },
-  dob: { type: String, default: "Not Selected" },
+  // dob: { type: String, default: "Not Selected" },
+  dob: {
+    type: String,
+    default: () => new Date().toISOString().split("T")[0], // -> Current Date ko ISO string (YYYY-MM-DDTHH:mm:ssZ) me convert karta hai,-> "T" pe split karke sirf date part (YYYY-MM-DD) return karta hai,> Matlab hamesha user create hone wale din ki date dob me set hogi
+  },
   phone: { type: String, default: "0000000000" },
 });
 

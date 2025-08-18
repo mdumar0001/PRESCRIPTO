@@ -15,6 +15,7 @@ const DoctorAppointment = () => {
   useEffect(() => {
     if (dToken) {
       getAppointments();
+      console.log(appointments);
     }
   }, [dToken]);
   return (

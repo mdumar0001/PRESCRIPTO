@@ -8,6 +8,8 @@ const AppContextProvider = (props) => {
     const birthDate = new Date(dob);
 
     let age = today.getFullYear() - birthDate.getFullYear();
+    // console.log(birthDate);
+    console.log(age);
     return age;
   };
   //to change date format

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
 
@@ -23,6 +24,7 @@ const MyAppointments = () => {
     "Dec",
   ];
 
+  const navigate = useNavigate();
   const slotDateFormat = (slotDate) => {
     const dateArray = slotDate.split("_");
     return dateArray[0] + "" + months[Number(dateArray[1])] + "" + dateArray[2];
@@ -67,16 +69,36 @@ const MyAppointments = () => {
     }
   };
 
-  const appointmentRazorpay = async (appointmentId) => {
+  const StripePayment = async (appointmentId) => {
     try {
-      const { data } = await axios.post(
-        backendUrl + "/api/user/payment-razorpay",
+      // const { data } = await axios.post(
+      //   backendUrl + "/api/user/payment-razorpay",
+      //   { appointmentId },
+      //   { headers: { token } }
+      // );
+      // console.log(data);
+      // if (data.success) {
+      //   toast.success(data.message);
+      //   getUserAppointments();
+      //   navigate("/my-appointments");
+      // } else {
+      //   toast.error(data.message);
+      const responsestripe = await axios.post(
+        backendUrl + "/api/user/payment-stripe",
         { appointmentId },
         { headers: { token } }
       );
-      if (data.success) {
+      if (responsestripe.data.success) {
+        const { session_url } = responsestripe.data;
+        window.location.replace(session_url); //we will send the user to this url
+      } else {
+        toast.error(responsestripe.data.message); //go to dummy payment stripe to get fake card number
       }
-    } catch (error) {}
+      // }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -85,6 +107,7 @@ const MyAppointments = () => {
     }
   }, [token]); ///getuserappointment function fir se call hoga jab hum nye appointment book karenge appointment.jsx pe aur my-appointment.jsx pe ayenge to kyunki ye component unmoun hoke remount ho rha na ki re render
   //isliye my component list apne aap update ho ja rhi hai
+
   return (
     <div>
       <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
@@ -122,15 +145,20 @@ const MyAppointments = () => {
               {/* we have aded this empty div so that buttons go to the right in mobile view */}
             </div>
             <div className="flex flex-col gap-2 justify-end">
-              {!item.cancelled && (
+              {!item.cancelled && item.payment && !item.isCompleted && (
+                <button className="sm:min-w-48 py-2 border rounded text-stone-500 bg-indigo-50">
+                  Paid
+                </button>
+              )}
+              {!item.cancelled && !item.payment && !item.isCompleted && (
                 <button
-                  onClick={() => appointmentRazorpay(item._id)}
+                  onClick={() => StripePayment(item._id)}
                   className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-indigo-500 hover:text-white transition-all duration-300"
                 >
                   Pay Online
                 </button>
               )}
-              {!item.cancelled && (
+              {!item.cancelled && !item.isCompleted && (
                 <button
                   onClick={() => cancelAppointment(item._id)}
                   className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300"
@@ -138,9 +166,14 @@ const MyAppointments = () => {
                   Cancel Appointment
                 </button>
               )}
-              {item.cancelled && (
+              {item.cancelled && !item.isCompleted && (
                 <button className="sm:min-w-48 py-2 border border-red-400 rounded">
                   Appointment Cancelled
+                </button>
+              )}
+              {item.isCompleted && (
+                <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">
+                  Completed
                 </button>
               )}
             </div>

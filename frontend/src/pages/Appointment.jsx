@@ -44,12 +44,29 @@ const Appointment = () => {
       endtime.setHours(21, 0, 0, 0);
       // console.log(endtime);
       //setting hours
-      if (today.getDate() === currentDate.getDate()) {
-        currentDate.setHours(
-          currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
-        );
-        currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
+      // if (today.getDate() === currentDate.getDate()) {
+      //   currentDate.setHours(
+      //     currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
+      //   );
+      //   currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
+      // } else {
+      //   currentDate.setHours(10);
+      //   currentDate.setMinutes(0);
+      // }
+      if (i === 0) {
+        // Aaj ka din
+        if (today.getHours() >= 21) {
+          // Agar already 9 baje ke baad hai → skip karo (continue loop)
+          continue;
+        } else {
+          // Agar 9 baje se pehle hai → current time se next slot nikalo
+          currentDate.setHours(
+            currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
+          );
+          currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
+        }
       } else {
+        // Kal se slots hamesha 10:00 se start honge
         currentDate.setHours(10);
         currentDate.setMinutes(0);
       }
@@ -93,6 +110,7 @@ const Appointment = () => {
         //Increment current tie by 30 minutes
         currentDate.setMinutes(currentDate.getMinutes() + 30);
       }
+      // console.log(docSlots);
       setDocSlots((prev) => [...prev, timeSlots]);
     }
   };

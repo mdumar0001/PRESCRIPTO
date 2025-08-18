@@ -5,6 +5,9 @@ import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorModel.js";
 import appoitmentModel from "../models/appointmentModel.js";
+import Stripe from "stripe";
+const currency = "inr";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // import razorpay from "razorpay";
 //API to register user
 const registerUser = async (req, res) => {
@@ -81,7 +84,7 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { name, phone, address, dob, gender } = req.body;
-    console.log(name, phone, address, dob, gender);
+    // console.log(name, phone, address, dob, gender);
     const userId = req.user.id;
     const imageFile = req.file;
     if (!name || !phone || !dob || !gender || !address) {
@@ -95,6 +98,8 @@ const updateProfile = async (req, res) => {
       gender,
     });
 
+    let updatedUser;
+
     if (imageFile) {
       //upload image to cloudinary
       const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
@@ -102,8 +107,29 @@ const updateProfile = async (req, res) => {
       });
       const imageUrl = imageUpload.secure_url;
 
-      await userModel.findByIdAndUpdate(userId, { image: imageUrl });
+      const updatedUser = await userModel.findByIdAndUpdate(
+        userId,
+        { image: imageUrl },
+        { new: true }
+      );
+      //Ye { new: true } option sirf return hone wale document pe effect karta hai, database me update to waise hi hota hai chahe aap { new: true } likho ya na likho.
+      //Agar { new: true } likhoge → updatedUser me nayi dob milegi.
+    } else {
+      updatedUser = await userModel.findById(userId); // agar image nahi hai to latest user fetch
     }
+    //updating in appointments only if it is available for that user
+    const checkAppointment = await appoitmentModel.find({ userId });
+    if (!checkAppointment || checkAppointment.length === 0) {
+      //   if (!checkAppointment) Ye condition kabhi true nahi hogi, kyunki find() empty array return karega, aur [] truthy hota hai.
+      return res.json({ success: true, message: "Info Updated" });
+    }
+    // Step 3: userData ko appointment me sync karo
+    await appoitmentModel.updateMany(
+      { userId: userId },
+      { $set: { userData: updatedUser.toObject() } }
+    );
+    // agar{ $set: { updatedUser } } likh rahe ho, matlab appointment document me ek naya field updatedUser ban jayega.
+    // Lekin tum chahte ho ki appointment ke andar jo userData object hai wahi update ho.
     res.json({ success: true, message: "Profile Updated" });
   } catch (error) {
     console.log(error);
@@ -224,7 +250,7 @@ const cancelAppointment = async (req, res) => {
 const paymentRazorpay = async (req, res) => {
   try {
     const { appointmentId } = req.body;
-    const { appointmentData } = await appoitmentModel.findById(appointmentId);
+    const appointmentData = await appoitmentModel.findById(appointmentId);
 
     if (!appointmentData || appointmentData.cancelled) {
       return res.json({
@@ -232,23 +258,133 @@ const paymentRazorpay = async (req, res) => {
         message: "Appointment cancelled or not found",
       });
     }
-
-    //creating options for razorpay payment
-    const options = {
-      amount: appointmentData.amount * 100,
-      currency: process.env.CURRENCY,
-      receipt: appointmentId,
-    };
-
-    //creation of an order
-    const order = await razorpayInstance.orders.create(options);
-
-    res.json({ success: true, order });
+    await appoitmentModel.findByIdAndUpdate(appointmentId, {
+      payment: true,
+    });
+    res.json({ success: true, message: "Payment Successful" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
+
+const placeOrderStripe = async (req, res) => {
+  try {
+    // const { items, amount, address } = req.body;
+    // const userId = req.user.id;
+    //origin url from where user initiated the payments (frontend url) ie here localhost:5173
+    const { appointmentId } = req.body;
+    const appointmentData = await appoitmentModel.findById(appointmentId);
+    if (!appointmentData || appointmentData.cancelled) {
+      return res.json({
+        success: true,
+        message: "Appointment cancelled or not found",
+      });
+    }
+    const { origin } = req.headers;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "inr", // or "inr", etc.
+            product_data: {
+              name: "Appointment Payment",
+            },
+            unit_amount: appointmentData.amount * 100, // amount in cents
+          },
+          quantity: 1,
+        },
+      ],
+      // success_url: `${origin}/verify?success=true&orderId=${appointmentId}`,
+      // cancel_url: `${origin}/verify?success=false&orderId=${appointmentId}`,
+      success_url: `${origin}/verify?success=true&appointmentId=${appointmentId}&sessionId={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/verify?success=false&appointmentId=${appointmentId}&sessionId={CHECKOUT_SESSION_ID}`,
+    });
+    res.json({ success: true, session_url: session.url });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//Verify Stripe
+// const verifyStripe = async (req, res) => {
+//   const { appointmentId, success } = req.body;
+//   const userId = req.user.id;
+//   try {
+//     if (success === "true") {
+//       // await orderModel.findByIdAndUpdate(orderId, { payment: true });
+//       // await userModel.findByIdAndUpdate(userId, { cartData: {} });
+//       await appoitmentModel.findByIdAndUpdate(appointmentId, {
+//         payment: true,
+//       });
+//       res.json({ success: true, message: "Payment Successful" });
+//       // res.json({ success: true });
+//     } else {
+//       res.json({ success: false, message: "Payment Failed" });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+const verifyStripe = async (req, res) => {
+  const { appointmentId, success, sessionId } = req.body;
+  const userId = req.user.id;
+  console.log("paid stripe");
+  try {
+    if (success === "true") {
+      // Stripe se confirm karo
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+      if (session.payment_status === "paid") {
+        await appoitmentModel.findByIdAndUpdate(appointmentId, {
+          payment: true,
+        });
+
+        return res.json({ success: true, message: "Payment Successful" });
+      } else {
+        return res.json({ success: false, message: "Payment not completed" });
+      }
+    } else {
+      res.json({ success: false, message: "Payment Failed" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API to verify payment of razorpay
+// const verifyRazorpay = async (req, res) => {
+//   try {
+//     // const { raorpay_order_id } = req.body;ks
+//     const { order_id, payment_id } = req.body;
+//     // const orderInfo = await razorpayInstance.orders.fetch(raorpay_order_id);
+
+//     // console.log(orderInfo);
+//     // if (orderInfo.status === "paid") {
+//     //   await appoitmentModel.findByIdAndUpdate(orderInfo.receipt, {
+//     //     payment: true,
+//     //   });
+//     //   res.json({ success: true, message: "Payment Successful" });
+//     // } else {
+//     //   res.json({ success: false, message: "Payment Failed" });
+//     // }
+//     res.json({
+//       success: true,
+//       message: "Payment Successful",
+//       order_id,
+//       payment_id,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.json({ success: false, message: error.message });
+//   }
+// };
 
 export {
   registerUser,
@@ -259,4 +395,6 @@ export {
   listAppointments,
   cancelAppointment,
   paymentRazorpay,
+  placeOrderStripe,
+  verifyStripe,
 };

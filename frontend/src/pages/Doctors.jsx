@@ -48,7 +48,7 @@ const Doctors = () => {
                 : ""
             }`}
           >
-            General physician
+            General Physician
           </p>
           <p
             onClick={() =>
@@ -101,7 +101,7 @@ const Doctors = () => {
           >
             Neurologist
           </p>
-          <p
+          {/* <p
             onClick={() =>
               speciality === "Gastroenterologist"
                 ? navigate("/doctors")
@@ -114,7 +114,7 @@ const Doctors = () => {
             }`}
           >
             Gastroenterologist
-          </p>
+          </p> */}
         </div>
         <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 gap-y-6">
           {filterDoc.map((item, index) => (
@@ -133,9 +133,9 @@ const Doctors = () => {
                   <p
                     className={`w-2 h-2 ${
                       item.available ? "bg-green-500" : "bg-gray-500"
-                    } bg-green-500 rounded-full`}
+                    } rounded-full`}
                   ></p>
-                  <p>{item.avaialble ? "Available" : "Not Avaiable"}</p>
+                  <p>{item.available ? "Available" : "Not Avaiable"}</p>
                 </div>
                 <p className="text-gray-900 text-lg font-medium">{item.name}</p>
                 <p className="text-gray-600 text-sm">{item.speciality}</p>

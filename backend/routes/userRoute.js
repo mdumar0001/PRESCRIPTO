@@ -8,6 +8,8 @@ import {
   listAppointments,
   cancelAppointment,
   paymentRazorpay,
+  placeOrderStripe,
+  verifyStripe,
 } from "../controllers/userController.js";
 import upload from "../middlewares/multer.js";
 import authUser from "../middlewares/authUser.js";
@@ -27,4 +29,7 @@ userRouter.post("/book-appointment", authUser, bookAppointment);
 userRouter.get("/my-appointments", authUser, listAppointments);
 userRouter.post("/cancel-appointment", authUser, cancelAppointment);
 userRouter.post("/payment-razorpay", authUser, paymentRazorpay);
+userRouter.post("/payment-stripe", authUser, placeOrderStripe);
+userRouter.post("/verifyStripe", authUser, verifyStripe);
+
 export default userRouter;
