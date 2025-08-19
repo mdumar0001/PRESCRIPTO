@@ -21,5 +21,5 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: { port: 5173 },
-  base: "/", // 👈 Render ke liye important
+  // base: "/", //  Render ke liye importants
 });
