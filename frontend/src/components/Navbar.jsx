@@ -40,6 +40,16 @@ const Navbar = () => {
           <hr className=" border-none outline-none h-0.5 bg-indigo-500 w-3/5 m-auto hidden" />
         </NavLink>
       </ul>
+      <button
+        onClick={
+          () =>
+            window.open(`${import.meta.env.VITE_ADMIN_DOCTOR_PANEL}`, "_blank")
+          //VITE_likhna padta hai pahle environent variable banane se pahle
+        }
+        className="px-1 py-2 rounded-lg text-sm bg-gray-500 text-white hover:bg-green-800 active:translate-y-[1px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-300 shadow"
+      >
+        Admin & Doctor Panel
+      </button>
       <div className="flex items-center gap-4">
         {token && userData ? (
           <div className="flex items-center gap-2 cursor-pointer group relative">
