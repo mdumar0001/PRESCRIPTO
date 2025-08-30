@@ -54,6 +54,27 @@ const Login = () => {
           <span className="text-indigo-500">{state}</span> Login
         </p>
         <div className="w-full ">
+          {state === "Admin" ? (
+            <p className="text-green-900 text-lg p-4">
+              Doctor Login?{" "}
+              <span
+                className="text-indigo-500 underline cursor-pointer"
+                onClick={() => setState("Doctor")}
+              >
+                Click here
+              </span>
+            </p>
+          ) : (
+            <p className="text-green-900 text-lg p-4">
+              Admin Login?{" "}
+              <span
+                className="text-indigo-500 underline cursor-pointer"
+                onClick={() => setState("Admin")}
+              >
+                Click here
+              </span>
+            </p>
+          )}
           <p>Email</p>
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +97,7 @@ const Login = () => {
         <button className="bg-indigo-500 py-2 text-white w-full rounded-md text-base cursor-pointer">
           Login
         </button>
-        {state === "Admin" ? (
+        {/* {state === "Admin" ? (
           <p>
             Doctor Login?{" "}
             <span
@@ -96,7 +117,7 @@ const Login = () => {
               Click here
             </span>
           </p>
-        )}
+        )} */}
       </div>
     </form>
   );

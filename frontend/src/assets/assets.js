@@ -59,7 +59,7 @@ export const assets = {
 
 export const specialityData = [
   {
-    speciality: "General physician",
+    speciality: "General Physician",
     image: General_physician,
   },
   {
@@ -71,17 +71,17 @@ export const specialityData = [
     image: Dermatologist,
   },
   {
-    speciality: "Pediatricians",
+    speciality: "Pediatrician",
     image: Pediatricians,
   },
   {
     speciality: "Neurologist",
     image: Neurologist,
   },
-  {
-    speciality: "Gastroenterologist",
-    image: Gastroenterologist,
-  },
+  // {
+  //   speciality: "Gastroenterologist",
+  //   image: Gastroenterologist,
+  // },
 ];
 
 export const doctors = [
@@ -134,7 +134,7 @@ export const doctors = [
     _id: "doc4",
     name: "Dr. Christopher Lee",
     image: doc4,
-    speciality: "Pediatricians",
+    speciality: "Pediatrician",
     degree: "MBBS",
     experience: "2 Years",
     about:
@@ -224,7 +224,7 @@ export const doctors = [
     _id: "doc10",
     name: "Dr. Jeffrey King",
     image: doc10,
-    speciality: "Pediatricians",
+    speciality: "Pediatrician",
     degree: "MBBS",
     experience: "2 Years",
     about:
